@@ -1,0 +1,172 @@
+version = '0.1.1'
+group = 'nl.mplatvoet.komponents'
+description = 'Kovenant. Promises for Kotlin.'
+
+
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:0.11.91'
+        classpath 'com.netflix.nebula:gradle-extra-configurations-plugin:2.2.+'
+    }
+}
+
+repositories { mavenCentral() }
+
+apply plugin: 'optional-base'
+apply plugin: 'kotlin'
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+dependencies {
+    compile 'org.jetbrains.kotlin:kotlin-stdlib:0.11.91', optional
+
+    testCompile 'junit:junit:4.12'
+}
+
+
+gradle.taskGraph.whenReady { taskGraph ->
+    def branchName = System.getenv('CIRCLE_BRANCH')?.trim()
+
+    if (!'master'.equals(branchName) && !taskGraph.hasTask(release)) {
+        enrichVersion()
+    }
+}
+
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task jars() {
+    dependsOn jar, sourcesJar, javadocJar
+}
+
+
+artifacts {
+    archives jar
+    archives javadocJar
+    archives sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+task release {
+    dependsOn signArchives
+}
+
+
+
+def sonatypeUsr = project.hasProperty('sonatypeUsername') ? sonatypeUsername : ''
+def sonatypePwd = project.hasProperty('sonatypePassword') ? sonatypePassword : ''
+
+uploadArchives {
+    dependsOn release
+
+    repositories.mavenDeployer {
+        configuration = configurations.archives
+
+        beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+
+        repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
+            authentication(userName: sonatypeUsr, password: sonatypePwd)
+        }
+
+
+        pom.project {
+            name 'Kovenant'
+            packaging 'jar'
+            description project.description
+            url 'http://kovenant.mplatvoet.nl'
+            inceptionYear '2015'
+
+            scm {
+                url 'scm:git:git@github.com:mplatvoet/kovenant.git'
+                connection 'scm:git:git@github.com:mplatvoet/kovenant.git'
+            }
+
+            licenses {
+                license {
+                    name 'MIT License'
+                    url 'http://opensource.org/licenses/MIT'
+                    distribution 'repo'
+                }
+            }
+
+            developers {
+                developer {
+                    id 'mplatvoet'
+                    name 'Mark Platvoet'
+                    email 'mplatvoet@gmail.com'
+                    url 'http://mplatvoet.nl'
+                }
+            }
+        }
+    }
+}
+
+
+
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.4-rc-1'
+}
+
+
+def enrichVersion() {
+    def circleBuildNr = System.getenv('CIRCLE_BUILD_NUM')?.trim()
+    def buildMetaData = circleBuildNr ? circleBuildNr : buildTime()
+
+    def kotlinVersion = extractKotlinMilestoneVersion()
+    def identifier = kotlinVersion ? "kotlinM$kotlinVersion" : "unknown"
+
+    version = "$version-$identifier+$buildMetaData"
+}
+
+String extractKotlinMilestoneVersion() {
+    def rawVersion = extractRawKotlinVersion()
+    if (rawVersion) {
+        def matcher = rawVersion =~ /\d+/
+        matcher.find()
+        matcher.find(matcher.end())
+        return rawVersion.substring(matcher.start(), matcher.end())
+    }
+    return null
+}
+
+String extractRawKotlinVersion() {
+    for (scope in rootProject.configurations.all) {
+
+        for (dep in scope.dependencies) {
+            def name = dep.name.toString()
+            def group = dep.group.toString()
+            if (name.equals("kotlin-stdlib") && group.equals("org.jetbrains.kotlin")) {
+                return dep.version
+            }
+        }
+    }
+    return null
+}
+
+
+def buildTime() {
+    def df = new java.text.SimpleDateFormat("yyyyMMdd'T'HHmm'Z'")
+    df.setTimeZone(TimeZone.getTimeZone("UTC"))
+    return df.format(new Date())
+}
+
+defaultTasks 'clean', 'libs'
+
+
