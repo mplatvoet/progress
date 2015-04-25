@@ -1,14 +1,10 @@
 package nl.mplatvoet.kotlin.komponents.progress
 
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicReference
-import java.util.concurrent.ConcurrentLinkedQueue
 import java.text.DecimalFormat
-import nl.mplatvoet.kotlin.komponents.properties.delegates.ThreadSafeDelegates
-
-/**
- * Created by mplatvoet on 12-3-14.
- */
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.atomic.AtomicReference
+import kotlin.properties.ReadOnlyProperty
 
 
 public class OutOfRangeException(msg: String, cause: Throwable? = null) : IllegalArgumentException(msg, cause)
@@ -22,7 +18,7 @@ public class Progress() {
         set(suggestedValue) {
             //checking whether this Progress object is managed by children is not thread safe.
             //it's just a way to catch misuse of the API
-            if (!children.empty) throw IllegalStateException("children manage the state of this Progress object")
+            if (!children.isEmpty()) throw IllegalStateException("children manage the state of this Progress object")
 
             when {
                 suggestedValue -> value = 1.0
@@ -35,7 +31,7 @@ public class Progress() {
         set(suggestedValue) {
             //checking whether this Progress object is managed by children is not thread safe.
             //it's just a way to catch misuse of the API
-            if (!children.empty) throw IllegalStateException("children manage the state of this Progress object")
+            if (!children.isEmpty()) throw IllegalStateException("children manage the state of this Progress object")
             if (suggestedValue !in (0.0..1.0)) throw OutOfRangeException("[$value] must be within bounds (0.0 .. 1.0)")
 
 
@@ -52,14 +48,14 @@ public class Progress() {
     fun child(weight: Int): Progress = child(weight.toDouble())
 
     fun child(weight: Double = 1.0): Progress {
-        if (weight < 0.0) throw IllegalArgumentException("weigth can not be negative")
+        if (weight < 0.0) throw IllegalArgumentException("weight can not be negative")
         val child = Progress()
         children.put(child, weight)
-        onUpdate { updateValue() }
+        child.onUpdate { updateValue() }
         return child
     }
 
-    private fun updateValue(): Unit {
+    private fun updateValue() {
         var notify: Boolean
         do {
             val currentVal = atomicVal.get()
@@ -96,41 +92,17 @@ public class Progress() {
 }
 
 
-private val percentageFormat by ThreadSafeDelegates.threadLocalVal { DecimalFormat("##0.00") }
+private val percentageFormat by ThreadLocalVal { DecimalFormat("##0.00") }
 
 val Double.percentage: String
     get() = if (this in (0.0..1.0)) percentageFormat.format(this * 100) else throw OutOfRangeException("[$this] must be within bounds (0.0 .. 1.0)")
 
 
-fun main (args: Array<String>) {
-    val progress = Progress()
-    progress.onUpdate {
-        println("${it.percentage}%")
+
+private class ThreadLocalVal<T>(private val initializer: () -> T) : ReadOnlyProperty<Any?, T> {
+    private val threadLocal = object : ThreadLocal<T>() {
+        override fun initialValue(): T = initializer()
     }
 
-    val sub1 = progress.child(0.1)
-    val sub2 = progress.child(5)
-    val sub2sub1 = sub2.child()
-    val sub2sub2 = sub2.child()
-    val sub3 = progress.child()
-    val sub4 = progress.child(2)
-
-    sub1.value = 0.25
-    sub1.value = 0.50
-    sub1.value = 0.75
-    sub1.value = 1.0
-
-    sub2sub1.completed = true
-    sub2sub2.value = 0.5
-    sub2sub2.value = 1.0
-
-    sub3.value = 0.25
-    sub3.value = 0.50
-    sub3.value = 0.75
-    sub3.value = 1.0
-
-    sub4.value = 0.25
-    sub4.value = 0.50
-    sub4.value = 0.75
-    sub4.value = 1.0
+    public override fun get(thisRef: Any?, desc: PropertyMetadata): T = threadLocal.get() : T
 }
