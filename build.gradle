@@ -86,10 +86,10 @@ uploadArchives {
 
 
         pom.project {
-            name 'Kovenant'
+            name 'Progress'
             packaging 'jar'
             description project.description
-            url 'http://kovenant.mplatvoet.nl'
+            url 'http://progress.mplatvoet.nl'
             inceptionYear '2015'
 
             scm {
