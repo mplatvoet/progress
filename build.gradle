@@ -93,8 +93,8 @@ uploadArchives {
             inceptionYear '2015'
 
             scm {
-                url 'scm:git:git@github.com:mplatvoet/kovenant.git'
-                connection 'scm:git:git@github.com:mplatvoet/kovenant.git'
+                url 'scm:git:git@github.com:mplatvoet/progress.git'
+                connection 'scm:git:git@github.com:mplatvoet/progress.git'
             }
 
             licenses {

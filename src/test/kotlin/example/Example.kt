@@ -5,8 +5,8 @@ import nl.mplatvoet.kotlin.komponents.progress.percentage
 
 fun main(args: Array<String>) {
     val progress = Progress()
-    progress.onUpdate {
-        println("${it.percentage}%")
+    progress.onUpdate { p->
+        println("${p.percentage}%")
     }
 
     val sub1 = progress.child(0.1)
