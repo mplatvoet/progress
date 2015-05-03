@@ -20,18 +20,8 @@
  * THE SOFTWARE.
  */
 
-rootProject.name = 'root'
+project.description = "Progress tracking for Kotlin"
 
-include 'core'
-include 'progress'
-include 'kovenant'
-
-rootProject.children.each { project ->
-    String projectFileName = project.name.replaceAll("\\p{Upper}") { "-${it.toLowerCase()}" }
-    String projectDirName = "projects/$projectFileName"
-    project.projectDir = new File(settingsDir, projectDirName)
-    project.buildFileName = "${projectFileName}.gradle"
+dependencies {
+    compile project(':progress-core')
 }
-
-project(":core").name = "progress-core"
-project(":kovenant").name = "progress-kovenant"
