@@ -71,7 +71,7 @@ public class Progress() {
         var totalWeightValue = 0.0
         for ((p, w) in children) {
             totalWeight += w
-            totalWeightValue += value * w
+            totalWeightValue += p.value * w
         }
         return if (totalWeight > 0.0 && totalWeightValue > 0.0) totalWeightValue / totalWeight else 0.0
     }
