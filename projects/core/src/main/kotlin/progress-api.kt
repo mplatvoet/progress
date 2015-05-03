@@ -27,10 +27,23 @@ public fun progressControl() : ProgressControl = concreteProgressControl()
 public trait Progress {
     val done : Boolean
     val value : Double
+
     fun update(notifyOnAdd: Boolean = true, body : Progress.() -> Unit)
 
     val intValue : Int get() = (value * 100).toInt()
+
+    val children : List<ChildProgress>
+
+    fun contains(progress : Progress) : Boolean {
+        if (progress == this) return true
+        children.forEach {
+            if (it.progress.contains(progress)) return true
+        }
+        return false
+    }
 }
+
+public data class ChildProgress(val progress: Progress, val weight: Double = 1.0)
 
 public trait ProgressControl  {
     var value : Double
@@ -39,5 +52,7 @@ public trait ProgressControl  {
 
     fun markAsDone()
     val progress : Progress
+
+
 }
 

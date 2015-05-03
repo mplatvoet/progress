@@ -22,16 +22,19 @@
 
 package nl.mplatvoet.komponents.progress
 
+import java.util.ArrayList
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicReference
 
 
-public fun concreteProgressControl(): ProgressControl = JvmProgress()
+public fun concreteProgressControl(): ProgressControl {
+    return JvmProgress()
+}
 
 
 private class JvmProgress() : ProgressControl, Progress {
-    private val children = ConcurrentHashMap<Progress, Double>()
+    private val childProgresses = ConcurrentLinkedQueue<ChildProgress>()
     private val callbacks = ConcurrentLinkedQueue<Progress.() -> Unit>()
     private val atomicVal = AtomicReference(0.0)
 
@@ -51,7 +54,7 @@ private class JvmProgress() : ProgressControl, Progress {
         set(suggestedValue) {
             //checking whether this Progress object is managed by children is not thread safe.
             //it's just a way to catch misuse of the API
-            if (!children.isEmpty()) throw IllegalStateException("children manage the state of this Progress object")
+            if (!childProgresses.isEmpty()) throw IllegalStateException("children manage the state of this Progress object")
             if (suggestedValue !in (0.0..1.0)) throw OutOfRangeException("[$value] must be within bounds (0.0 .. 1.0)")
 
 
@@ -70,11 +73,26 @@ private class JvmProgress() : ProgressControl, Progress {
         return child
     }
 
-    //TODO, prevent circular additions
+    override val children: List<ChildProgress>
+        get() = ArrayList(childProgresses)
+
+
+    //Prevents a copy of the children list
+    override fun contains(progress: Progress): Boolean {
+        if (this == progress) return true
+
+        childProgresses forEach {
+            if(it.progress.contains(progress)) return false
+        }
+
+        return false
+    }
+
     override fun addChild(progress: Progress, weight: Double) {
         if (weight < 0.0) throw IllegalArgumentException("weight can not be negative")
+        if (contains(progress)) throw IllegalArgumentException("circular reference")
 
-        children.put(progress, weight)
+        childProgresses add ChildProgress(progress, weight)
         progress.update { updateValue() }
     }
 
@@ -92,7 +110,7 @@ private class JvmProgress() : ProgressControl, Progress {
     private fun calculateProgressFromChildren(): Double {
         var totalWeight = 0.0
         var totalWeightValue = 0.0
-        for ((p, w) in children) {
+        for ((p, w) in childProgresses) {
             totalWeight += w
             totalWeightValue += p.value * w
         }

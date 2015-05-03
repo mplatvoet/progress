@@ -52,20 +52,24 @@ public fun <V, R> ProgressPromise<V, Exception>.then(bind: ProgressControl.(V) -
         else -> Kovenant.context
     }
 
-    //TODO, build flat
-    //should create a control with all previous progress controls
-    //as first child controls. A chain of controls would then report
-    //progress as a whole which is probably the intention
-    val control = progressControl()
-    control.addChild(progress)
-    val childControl = control.createChild()
+    val masterControl = progressControl()
+    val children = progress.children
+    if (children.isEmpty()) {
+        masterControl addChild progress
+    } else {
+        children.forEach {
+            masterControl.addChild(it.progress, it.weight)
+        }
+    }
+
+    val contextControl = masterControl.createChild()
     val deferred = deferred<R, Exception>(context)
     success {
         context.workerDispatcher offer {
             try {
-                val result = childControl.bind(it)
+                val result = contextControl.bind(it)
                 deferred.resolve(result)
-                childControl.markAsDone()
+                contextControl.markAsDone()
             } catch(e: Exception) {
                 deferred.reject(e)
             }
@@ -74,7 +78,7 @@ public fun <V, R> ProgressPromise<V, Exception>.then(bind: ProgressControl.(V) -
     fail {
         deferred.reject(it)
     }
-    return JvmProgressPromise(deferred.promise, control.progress)
+    return JvmProgressPromise(deferred.promise, masterControl.progress)
 }
 
 

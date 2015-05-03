@@ -30,12 +30,17 @@ fun main(args: Array<String>) {
     val promise = async {
         1..10 forEach {
             value = 1.0 - ((10 - it) / 10.0)
-            Thread.sleep(1000L)
+            Thread.sleep(100L)
         }
     } then {
         1..10 forEach {
             value = 1.0 - ((10 - it) / 10.0)
-            Thread.sleep(2000L)
+            Thread.sleep(100L)
+        }
+    } then {
+        1..10 forEach {
+            value = 1.0 - ((10 - it) / 10.0)
+            Thread.sleep(100L)
         }
     }
 
