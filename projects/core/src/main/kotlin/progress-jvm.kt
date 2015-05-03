@@ -22,18 +22,16 @@
 
 package nl.mplatvoet.komponents.progress
 
-import java.text.DecimalFormat
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicReference
-import kotlin.properties.ReadOnlyProperty
 
 
-public fun concreteProgressControl() : ProgressControl = JvmProgress()
+public fun concreteProgressControl(): ProgressControl = JvmProgress()
 
 
 private class JvmProgress() : ProgressControl, Progress {
-    private val children = ConcurrentHashMap<JvmProgress, Double>()
+    private val children = ConcurrentHashMap<Progress, Double>()
     private val callbacks = ConcurrentLinkedQueue<Progress.() -> Unit>()
     private val atomicVal = AtomicReference(0.0)
 
@@ -66,14 +64,18 @@ private class JvmProgress() : ProgressControl, Progress {
         }
 
 
-
-
     override fun createChild(weight: Double): ProgressControl {
-        if (weight < 0.0) throw IllegalArgumentException("weight can not be negative")
         val child = JvmProgress()
-        children.put(child, weight)
-        child.update { updateValue() }
+        addChild(child.progress, weight)
         return child
+    }
+
+    //TODO, prevent circular additions
+    override fun addChild(progress: Progress, weight: Double) {
+        if (weight < 0.0) throw IllegalArgumentException("weight can not be negative")
+
+        children.put(progress, weight)
+        progress.update { updateValue() }
     }
 
     private fun updateValue() {

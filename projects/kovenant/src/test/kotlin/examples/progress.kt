@@ -20,24 +20,27 @@
  * THE SOFTWARE.
  */
 
-package nl.mplatvoet.komponents.progress
+package examples.progress
 
-public fun progressControl() : ProgressControl = concreteProgressControl()
+import nl.mplatvoet.komponents.progress.kovenant.async
+import nl.mplatvoet.komponents.progress.kovenant.then
 
-public trait Progress {
-    val done : Boolean
-    val value : Double
-    fun update(notifyOnAdd: Boolean = true, body : Progress.() -> Unit)
 
-    val intValue : Int get() = (value * 100).toInt()
+fun main(args: Array<String>) {
+    val promise = async {
+        1..10 forEach {
+            value = 1.0 - ((10 - it) / 10.0)
+            Thread.sleep(1000L)
+        }
+    } then {
+        1..10 forEach {
+            value = 1.0 - ((10 - it) / 10.0)
+            Thread.sleep(2000L)
+        }
+    }
+
+
+    promise.progress.update {
+        println(intValue)
+    }
 }
-
-public trait ProgressControl  {
-    var value : Double
-    fun createChild(weight : Double = 1.0) : ProgressControl
-    fun addChild(progress: Progress, weight : Double = 1.0)
-
-    fun markAsDone()
-    val progress : Progress
-}
-
