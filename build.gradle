@@ -21,7 +21,7 @@
  */
 
 buildscript {
-    ext.kotlinVersion = '0.11.91.2'
+    ext.kotlinVersion = '0.12.200'
     ext.extraConfVersion = '2.2.+'
 
     repositories {
@@ -38,8 +38,8 @@ apply from: "${rootProject.projectDir}/gradle/versions.gradle"
 
 allprojects {
     ext {
-        appVersion = '0.1.2'
-        appGroup = 'nl.mplatvoet.komponents'
+        appVersion = '0.2.0'
+        appGroup = 'nl.komponents.progress'
 
 
         junitVersion = '4.12'

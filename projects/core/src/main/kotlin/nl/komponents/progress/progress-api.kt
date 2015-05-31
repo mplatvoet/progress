@@ -20,32 +20,42 @@
  * THE SOFTWARE.
  */
 
-package examples.progress
+package nl.komponents.progress
 
-import nl.mplatvoet.komponents.progress.kovenant.async
-import nl.mplatvoet.komponents.progress.kovenant.then
+public fun progressControl(executor: (progress: Progress, body: Progress.() -> Unit) -> Unit = { p, fn -> p.fn() }): ProgressControl = concreteProgressControl(executor)
 
+public interface Progress {
+    val executor: (progress: Progress, body: Progress.() -> Unit) -> Unit
+    val done: Boolean
+    val value: Double
 
-fun main(args: Array<String>) {
-    val promise = async {
-        1..10 forEach {
-            value = 1.0 - ((10 - it) / 10.0)
-            Thread.sleep(100L)
+    fun update(executor: (progress: Progress, body: Progress.() -> Unit) -> Unit = this.executor,
+               notifyOnAdd: Boolean = true,
+               body: Progress.() -> Unit)
+
+    val intValue: Int get() = (value * 100).toInt()
+
+    val children: List<ChildProgress>
+
+    fun contains(progress: Progress): Boolean {
+        if (progress == this) return true
+        children.forEach {
+            if (it.progress.contains(progress)) return true
         }
-    } then {
-        1..10 forEach {
-            value = 1.0 - ((10 - it) / 10.0)
-            Thread.sleep(100L)
-        }
-    } then {
-        1..10 forEach {
-            value = 1.0 - ((10 - it) / 10.0)
-            Thread.sleep(100L)
-        }
-    }
-
-
-    promise.progress.update {
-        println(intValue)
+        return false
     }
 }
+
+public data class ChildProgress(val progress: Progress, val weight: Double = 1.0)
+
+public interface ProgressControl {
+    var value: Double
+    fun createChild(weight: Double = 1.0): ProgressControl
+    fun addChild(progress: Progress, weight: Double = 1.0)
+
+    fun markAsDone()
+    val progress: Progress
+
+
+}
+

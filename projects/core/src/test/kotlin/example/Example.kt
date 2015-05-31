@@ -22,8 +22,8 @@
 
 package example
 
-import nl.mplatvoet.komponents.progress.OutOfRangeException
-import nl.mplatvoet.komponents.progress.progressControl
+import nl.komponents.progress.OutOfRangeException
+import nl.komponents.progress.progressControl
 import java.text.DecimalFormat
 import kotlin.properties.ReadOnlyProperty
 
@@ -71,6 +71,6 @@ private class ThreadLocalVal<T>(private val initializer: () -> T) : ReadOnlyProp
         override fun initialValue(): T = initializer()
     }
 
-    public override fun get(thisRef: Any?, desc: PropertyMetadata): T = threadLocal.get() : T
+    public override fun get(thisRef: Any?, desc: PropertyMetadata): T = threadLocal.get()
 }
 
