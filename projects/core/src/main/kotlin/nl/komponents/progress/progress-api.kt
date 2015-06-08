@@ -39,10 +39,7 @@ public interface Progress {
 
     fun contains(progress: Progress): Boolean {
         if (progress == this) return true
-        children.forEach {
-            if (it.progress.contains(progress)) return true
-        }
-        return false
+        return children any { child -> child.progress.contains(progress) }
     }
 }
 
@@ -55,7 +52,4 @@ public interface ProgressControl {
 
     fun markAsDone()
     val progress: Progress
-
-
 }
-
