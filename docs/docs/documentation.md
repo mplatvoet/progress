@@ -48,7 +48,7 @@ Progress is the client part of progress tracking. You can register a callback fo
 just query the current state. This can be shared across threads. You obtain a `Progress` instance from a `ProgressControl`
 instance.
 
-```
+```kt
 val control = //...
 val progress = control.progress
 
