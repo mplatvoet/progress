@@ -38,7 +38,7 @@ apply from: "${rootProject.projectDir}/gradle/versions.gradle"
 
 allprojects {
     ext {
-        appVersion = '0.2.0'
+        appVersion = '0.1.0'
         appGroup = 'nl.komponents.progress'
 
 
@@ -194,7 +194,7 @@ task release {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.4-rc-1'
+    gradleVersion = '2.4'
 
     doLast() {
         def gradleOpts = "-XX:MaxMetaspaceSize=1024m -Xmx1024m"

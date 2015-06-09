@@ -6,7 +6,7 @@ Track progress for [Kotlin](http://kotlinlang.org)
 ```
 
 ## Getting started
-This version is build against `Java 7` and `kotlin-stdlib:0.11.91`.
+This version is build against `Java 7` and `kotlin-stdlib:0.12.200`.
 
 ###Gradle
 ```groovy

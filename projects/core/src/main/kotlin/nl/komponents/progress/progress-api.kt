@@ -23,10 +23,16 @@
 package nl.komponents.progress
 
 
-
-
+/**
+ * Represents the consumer part of progress tracking
+ */
 public interface Progress {
     companion object {
+        /**
+         * defaultExecutor is the executor to be used when none is configured
+         *
+         * By default this just executes immediately
+         */
         var defaultExecutor : (() -> Unit) -> Unit = { fn -> fn() }
 
         public fun control(executor: (() -> Unit) -> Unit = defaultExecutor): SingleProgressControl {
