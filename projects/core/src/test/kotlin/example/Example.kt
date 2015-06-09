@@ -23,41 +23,41 @@
 package example
 
 import nl.komponents.progress.OutOfRangeException
-import nl.komponents.progress.progressControl
+import nl.komponents.progress.Progress
 import java.text.DecimalFormat
 import kotlin.properties.ReadOnlyProperty
 
 fun main(args: Array<String>) {
-    val control = progressControl()
-    control.progress.update {
+    val masterControl = Progress.containerControl()
+    masterControl.progress.update {
         println("${value.percentage}%")
     }
 
-    val sub1 = control.createChild(0.1)
-    val sub2 = control.createChild(5.0)
-    val sub2sub1 = sub2.createChild()
-    val sub2sub2 = sub2.createChild()
-    val sub3 = control.createChild()
-    val sub4 = control.createChild(2.0)
+    val firstChild = masterControl.child(0.1)
+    val secondChild = masterControl.containerChild(5.0)
+    val secondChildFirstChild = secondChild.child()
+    val secondChildSecondChild = secondChild.child()
+    val thirdChild = masterControl.child()
+    val fourthChild = masterControl.child(2.0)
 
-    sub1.value = 0.25
-    sub1.value = 0.50
-    sub1.value = 0.75
-    sub1.value = 1.0
+    firstChild.value = 0.25
+    firstChild.value = 0.50
+    firstChild.value = 0.75
+    firstChild.value = 1.0
 
-    sub2sub1.markAsDone()
-    sub2sub2.value = 0.5
-    sub2sub2.value = 1.0
+    secondChildFirstChild.markAsDone()
+    secondChildSecondChild.value = 0.5
+    secondChildSecondChild.value = 1.0
 
-    sub3.value = 0.25
-    sub3.value = 0.50
-    sub3.value = 0.75
-    sub3.value = 1.0
+    thirdChild.value = 0.25
+    thirdChild.value = 0.50
+    thirdChild.value = 0.75
+    thirdChild.value = 1.0
 
-    sub4.value = 0.25
-    sub4.value = 0.50
-    sub4.value = 0.75
-    sub4.value = 1.0
+    fourthChild.value = 0.25
+    fourthChild.value = 0.50
+    fourthChild.value = 0.75
+    fourthChild.value = 1.0
 }
 
 private val percentageFormat by ThreadLocalVal { DecimalFormat("##0.00") }
