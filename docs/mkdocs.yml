@@ -9,5 +9,6 @@ repo_name: 'GitHub'
 
 pages:
 - ['index.md', 'Home']
+- ['documentation.md', 'Documentation']
 
 theme_dir: theme/yeti

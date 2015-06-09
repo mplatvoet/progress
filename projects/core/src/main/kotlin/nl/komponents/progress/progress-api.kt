@@ -33,7 +33,7 @@ public interface Progress {
          *
          * By default this just executes immediately
          */
-        var defaultExecutor : (() -> Unit) -> Unit = { fn -> fn() }
+        volatile var defaultExecutor : (() -> Unit) -> Unit = { fn -> fn() }
 
         public fun control(executor: (() -> Unit) -> Unit = defaultExecutor): SingleProgressControl {
             return concreteSingleProgressControl(executor)
