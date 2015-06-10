@@ -1,7 +1,7 @@
 #Progress
 Track progress for [Kotlin](http://kotlinlang.org)
 
-[![CircleCI branch](https://img.shields.io/circleci/project/mplatvoet/progress/master.svg)](https://circleci.com/gh/mplatvoet/progress/tree/master) [![Maven Central](https://img.shields.io/maven-central/v/nl.komponents.progress/progress.svg)](http://search.maven.org/#browse%7C-339523586) [![DUB](https://img.shields.io/dub/l/vibe-d.svg)](https://github.com/mplatvoet/progress/blob/master/LICENSE)
+[![CircleCI branch](https://img.shields.io/circleci/project/mplatvoet/progress/master.svg)](https://circleci.com/gh/mplatvoet/progress/tree/master) [![Maven Central](https://img.shields.io/maven-central/v/nl.komponents.progress/progress.svg)](http://search.maven.org/#browse%7C-300825966) [![DUB](https://img.shields.io/dub/l/vibe-d.svg)](https://github.com/mplatvoet/progress/blob/master/LICENSE)
 
 ```kt
 //private part
