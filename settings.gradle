@@ -24,7 +24,6 @@ rootProject.name = 'root'
 
 include 'core'
 include 'progress'
-include 'kovenant'
 
 rootProject.children.each { project ->
     String projectFileName = project.name.replaceAll("\\p{Upper}") { "-${it.toLowerCase()}" }
@@ -34,4 +33,3 @@ rootProject.children.each { project ->
 }
 
 project(":core").name = "progress-core"
-project(":kovenant").name = "progress-kovenant"

@@ -1,37 +1,44 @@
 #Progress
-Progress tracking for Kotlin.
+Track progress for [Kotlin](http://kotlinlang.org)
 
----
+[![CircleCI branch](https://img.shields.io/circleci/project/mplatvoet/progress/master.svg)](https://circleci.com/gh/mplatvoet/progress/tree/master) [![Maven Central](https://img.shields.io/maven-central/v/nl.komponents.progress/progress.svg)](http://search.maven.org/#browse%7C-300825966) [![DUB](https://img.shields.io/dub/l/vibe-d.svg)](https://github.com/mplatvoet/progress/blob/master/LICENSE)
+
+Please refer to [progress.komponents.nl](http://progress.komponents.nl) for more information
 
 ```kt
-val progress = Progress()
-progress.onUpdate { p->
-    println("${p.percentage}%")
+//private part
+val control = Progress.control()
+
+//public part
+val progress = control.progress
+
+//get notified on updates
+progress.update {
+	println("${value}")
 }
 
-val sub1 = progress.child(weight = 0.1)
-val sub2 = progress.child(weight = 5)
-val sub2sub1 = sub2.child()
-val sub2sub2 = sub2.child()
-val sub3 = progress.child()
-val sub4 = progress.child(weight = 2)
+//set value
+control.value = 0.25
+control.value = 0.50
+control.value = 0.75
+control.value = 1.0
+```
 
-sub1.value = 0.25
-sub1.value = 0.50
-sub1.value = 0.75
-sub1.value = 1.0
+## Getting started
+This version is build against `kotlin-stdlib:0.12.200`.
 
-sub2sub1.completed = true
-sub2sub2.value = 0.5
-sub2sub2.value = 1.0
+###Gradle
+```groovy
+dependencies {
+    compile 'nl.komponents.progress:progress:0.1.+'
+}
+```
 
-sub3.value = 0.25
-sub3.value = 0.50
-sub3.value = 0.75
-sub3.value = 1.0
-
-sub4.value = 0.25
-sub4.value = 0.50
-sub4.value = 0.75
-sub4.value = 1.0
+###Maven
+```xml
+<dependency>
+	<groupId>nl.komponents.progress</groupId>
+	<artifactId>progress</artifactId>
+	<version>[0.1.0, 0.2.0)</version>
+</dependency>
 ```

@@ -20,26 +20,22 @@
  * THE SOFTWARE.
  */
 
-package nl.mplatvoet.komponents.progress
+package nl.komponents.progress
 
-import java.util.ArrayList
-import java.util.concurrent.ConcurrentHashMap
+import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicReference
 
 
-public fun concreteProgressControl(): ProgressControl {
-    return JvmProgress()
-}
+public fun concreteSingleProgressControl(executor: (() -> Unit) -> Unit): SingleProgressControl = JvmSingleProgress(executor)
+public fun concreteContainerProgressControl(executor: (() -> Unit) -> Unit): ContainerProgressControl = JvmContainerProgress(executor)
 
 
-private class JvmProgress() : ProgressControl, Progress {
-    private val childProgresses = ConcurrentLinkedQueue<ChildProgress>()
-    private val callbacks = ConcurrentLinkedQueue<Progress.() -> Unit>()
+
+private class JvmSingleProgress(executor: (() -> Unit) -> Unit) : SingleProgressControl, CallbackSupport(executor), Progress {
     private val atomicVal = AtomicReference(0.0)
 
-    override val progress: Progress
-        get() = this
+    override val progress: Progress = object : Progress by this {}
 
     override fun markAsDone() {
         value = 1.0
@@ -52,11 +48,7 @@ private class JvmProgress() : ProgressControl, Progress {
     public override var value: Double
         get() = atomicVal.get()
         set(suggestedValue) {
-            //checking whether this Progress object is managed by children is not thread safe.
-            //it's just a way to catch misuse of the API
-            if (!childProgresses.isEmpty()) throw IllegalStateException("children manage the state of this Progress object")
             if (suggestedValue !in (0.0..1.0)) throw OutOfRangeException("[$value] must be within bounds (0.0 .. 1.0)")
-
 
             var notify: Boolean
             do {
@@ -67,30 +59,30 @@ private class JvmProgress() : ProgressControl, Progress {
         }
 
 
-    override fun createChild(weight: Double): ProgressControl {
-        val child = JvmProgress()
-        addChild(child.progress, weight)
-        return child
+    override fun contains(progress: Progress): Boolean = this == progress
+}
+
+private class JvmContainerProgress(executor: (() -> Unit) -> Unit) : ContainerProgressControl, CallbackSupport(executor), Progress {
+    private val childProgresses = ConcurrentLinkedQueue<ChildProgress>()
+    private val atomicVal = AtomicReference(0.0)
+
+    private val self = this
+    override val progress: Progress = object : Progress by this {
+        override fun equals(other: Any?): Boolean = self.equals(other)
+        override fun hashCode(): Int = self.hashCode()
     }
 
-    override val children: List<ChildProgress>
-        get() = ArrayList(childProgresses)
+    public override val value: Double
+        get() = atomicVal.get()
 
-
-    //Prevents a copy of the children list
     override fun contains(progress: Progress): Boolean {
         if (this == progress) return true
-
-        childProgresses forEach {
-            if(it.progress.contains(progress)) return false
-        }
-
-        return false
+        return childProgresses any { child -> child.progress.contains(progress) }
     }
 
     override fun addChild(progress: Progress, weight: Double) {
-        if (weight < 0.0) throw IllegalArgumentException("weight can not be negative")
-        if (contains(progress)) throw IllegalArgumentException("circular reference")
+        if (weight < 0.0) throw ArgumentException("weight can not be negative")
+        if (progress.contains(this)) throw ArgumentException("circular reference")
 
         childProgresses add ChildProgress(progress, weight)
         progress.update { updateValue() }
@@ -116,18 +108,28 @@ private class JvmProgress() : ProgressControl, Progress {
         }
         return if (totalWeight > 0.0 && totalWeightValue > 0.0) totalWeightValue / totalWeight else 0.0
     }
-
-
-    private fun notifyUpdate() {
-        callbacks.forEach { body -> this.body() }
-    }
-
-    override fun update(notifyOnAdd: Boolean, body: Progress.() -> Unit) {
-        //Could miss an event, should record what's been called already
-        if (notifyOnAdd) this.body()
-        callbacks add body
-    }
-
 }
 
-public class OutOfRangeException(msg: String, cause: Throwable? = null) : IllegalArgumentException(msg, cause)
+private abstract class CallbackSupport(override val executor: (() -> Unit) -> Unit) : Progress {
+    private val callbacks = ConcurrentLinkedQueue<Callback>()
+
+    protected fun notifyUpdate() {
+        callbacks.forEach { cb -> cb.execute(this) }
+    }
+
+    override fun update(executor: (() -> Unit) -> Unit, notifyOnAdd: Boolean, body: Progress.() -> Unit) {
+        //Could miss an event, should record what's been called already
+        val callback = Callback(executor, body)
+        if (notifyOnAdd) {
+            callback.execute(this)
+        }
+        callbacks add callback
+    }
+}
+
+
+private class Callback(private val executor: (() -> Unit) -> Unit,
+                       private val cb: Progress.() -> Unit) {
+    fun execute(progress: Progress) = executor { progress.cb() }
+}
+
