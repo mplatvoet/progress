@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package example
+package example.default
 
 import nl.komponents.progress.OutOfRangeException
 import nl.komponents.progress.Progress
