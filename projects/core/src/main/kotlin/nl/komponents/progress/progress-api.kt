@@ -35,6 +35,8 @@ public interface Progress {
          */
         volatile var defaultExecutor : (() -> Unit) -> Unit = { fn -> fn() }
 
+        volatile var callbackType : CallbackType = CallbackType.BUFFERED
+
         public fun control(executor: (() -> Unit) -> Unit = defaultExecutor): SingleProgressControl {
             return concreteSingleProgressControl(executor)
         }
@@ -50,10 +52,16 @@ public interface Progress {
 
     fun update(executor: (() -> Unit) -> Unit = this.executor,
                notifyOnAdd: Boolean = true,
+               callbackType : CallbackType = Progress.callbackType,
                body: Progress.() -> Unit)
 
 
     fun contains(progress: Progress): Boolean
+}
+
+public enum class CallbackType {
+    BUFFERED,
+    ALWAYS
 }
 
 public data class ChildProgress(val progress: Progress, val weight: Double = 1.0)

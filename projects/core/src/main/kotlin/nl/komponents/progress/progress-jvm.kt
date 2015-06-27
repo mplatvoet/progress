@@ -22,14 +22,13 @@
 
 package nl.komponents.progress
 
-import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 
 
 public fun concreteSingleProgressControl(executor: (() -> Unit) -> Unit): SingleProgressControl = JvmSingleProgress(executor)
 public fun concreteContainerProgressControl(executor: (() -> Unit) -> Unit): ContainerProgressControl = JvmContainerProgress(executor)
-
 
 
 private class JvmSingleProgress(executor: (() -> Unit) -> Unit) : SingleProgressControl, CallbackSupport(executor), Progress {
@@ -117,9 +116,15 @@ private abstract class CallbackSupport(override val executor: (() -> Unit) -> Un
         callbacks.forEach { cb -> cb.execute(this) }
     }
 
-    override fun update(executor: (() -> Unit) -> Unit, notifyOnAdd: Boolean, body: Progress.() -> Unit) {
-        //Could miss an event, should record what's been called already
-        val callback = Callback(executor, body)
+    override fun update(executor: (() -> Unit) -> Unit,
+                        notifyOnAdd: Boolean,
+                        callbackType: CallbackType,
+                        body: Progress.() -> Unit) {
+        val callback = when (callbackType) {
+            CallbackType.BUFFERED -> JoinedCallback(executor, body)
+            CallbackType.ALWAYS -> AlwaysCallback(executor, body)
+        }
+
         if (notifyOnAdd) {
             callback.execute(this)
         }
@@ -127,9 +132,33 @@ private abstract class CallbackSupport(override val executor: (() -> Unit) -> Un
     }
 }
 
+private interface Callback {
+    fun execute(progress: Progress)
+}
 
-private class Callback(private val executor: (() -> Unit) -> Unit,
-                       private val cb: Progress.() -> Unit) {
-    fun execute(progress: Progress) = executor { progress.cb() }
+private class AlwaysCallback(private val executor: (() -> Unit) -> Unit,
+                             private val cb: Progress.() -> Unit) : Callback {
+    override fun execute(progress: Progress) {
+        executor {
+            progress.cb()
+        }
+    }
+}
+
+private class JoinedCallback(private val executor: (() -> Unit) -> Unit,
+                             private val cb: Progress.() -> Unit) : Callback {
+    private val scheduled = AtomicInteger(0)
+
+    override fun execute(progress: Progress) {
+        val count = scheduled.incrementAndGet()
+        if (count == 1) {
+            executor {
+                scheduled.decrementAndGet()
+                progress.cb()
+            }
+        } else {
+            scheduled.decrementAndGet()
+        }
+    }
 }
 
