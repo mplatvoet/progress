@@ -20,17 +20,28 @@
  * THE SOFTWARE.
  */
 
-package example
+package example.threaded
 
+import nl.komponents.progress.CallbackType
 import nl.komponents.progress.OutOfRangeException
 import nl.komponents.progress.Progress
 import java.text.DecimalFormat
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
 import kotlin.properties.ReadOnlyProperty
 
 fun main(args: Array<String>) {
+
+    Progress.callbackType = CallbackType.ALWAYS
+
+    val executorService = Executors.newFixedThreadPool(1)
+    Progress.defaultExecutor = { executorService.execute(it) }
+    val latch = CountDownLatch(1)
+
     val masterControl = Progress.containerControl()
     masterControl.progress.update {
         println("${value.percentage}%")
+        if (done) latch.countDown()
     }
 
     val firstChild = masterControl.child(0.1)
@@ -41,23 +52,32 @@ fun main(args: Array<String>) {
     val fourthChild = masterControl.child(2.0)
 
     firstChild.value = 0.25
+    Thread.sleep(10)
     firstChild.value = 0.50
+    Thread.sleep(10)
     firstChild.value = 0.75
+    Thread.sleep(10)
     firstChild.value = 1.0
 
     secondChildFirstChild.markAsDone()
     secondChildSecondChild.value = 0.5
+    Thread.sleep(10)
     secondChildSecondChild.value = 1.0
 
     thirdChild.value = 0.25
     thirdChild.value = 0.50
+    Thread.sleep(10)
     thirdChild.value = 0.75
     thirdChild.value = 1.0
 
     fourthChild.value = 0.25
     fourthChild.value = 0.50
+    Thread.sleep(10)
     fourthChild.value = 0.75
     fourthChild.value = 1.0
+
+    latch.await()
+    executorService.shutdown()
 }
 
 private val percentageFormat by ThreadLocalVal { DecimalFormat("##0.00") }
