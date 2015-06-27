@@ -120,9 +120,8 @@ private abstract class CallbackSupport(override val executor: (() -> Unit) -> Un
                         notifyOnAdd: Boolean,
                         callbackType: CallbackType,
                         body: Progress.() -> Unit) {
-        //Could miss an event, should record what's been called already
         val callback = when (callbackType) {
-            CallbackType.JOINED -> JoinedCallback(executor, body)
+            CallbackType.BUFFERED -> JoinedCallback(executor, body)
             CallbackType.ALWAYS -> AlwaysCallback(executor, body)
         }
 
@@ -139,8 +138,10 @@ private interface Callback {
 
 private class AlwaysCallback(private val executor: (() -> Unit) -> Unit,
                              private val cb: Progress.() -> Unit) : Callback {
-    override fun execute(progress: Progress) = executor {
-        progress.cb()
+    override fun execute(progress: Progress) {
+        executor {
+            progress.cb()
+        }
     }
 }
 

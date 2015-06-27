@@ -22,6 +22,7 @@
 
 package example.threaded
 
+import nl.komponents.progress.CallbackType
 import nl.komponents.progress.OutOfRangeException
 import nl.komponents.progress.Progress
 import java.text.DecimalFormat
@@ -30,6 +31,8 @@ import java.util.concurrent.Executors
 import kotlin.properties.ReadOnlyProperty
 
 fun main(args: Array<String>) {
+
+    Progress.callbackType = CallbackType.ALWAYS
 
     val executorService = Executors.newFixedThreadPool(1)
     Progress.defaultExecutor = { executorService.execute(it) }

@@ -35,7 +35,7 @@ public interface Progress {
          */
         volatile var defaultExecutor : (() -> Unit) -> Unit = { fn -> fn() }
 
-        volatile var callbackType : CallbackType = CallbackType.JOINED
+        volatile var callbackType : CallbackType = CallbackType.BUFFERED
 
         public fun control(executor: (() -> Unit) -> Unit = defaultExecutor): SingleProgressControl {
             return concreteSingleProgressControl(executor)
@@ -52,7 +52,7 @@ public interface Progress {
 
     fun update(executor: (() -> Unit) -> Unit = this.executor,
                notifyOnAdd: Boolean = true,
-               callbackType : CallbackType = CallbackType.JOINED,
+               callbackType : CallbackType = Progress.callbackType,
                body: Progress.() -> Unit)
 
 
@@ -60,7 +60,7 @@ public interface Progress {
 }
 
 public enum class CallbackType {
-    JOINED,
+    BUFFERED,
     ALWAYS
 }
 
