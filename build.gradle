@@ -21,7 +21,7 @@
  */
 
 buildscript {
-    ext.kotlinVersion = '0.12.613'
+    ext.kotlinVersion = '0.12.1230'
     ext.extraConfVersion = '2.2.+'
 
     repositories {
@@ -38,7 +38,7 @@ apply from: "${rootProject.projectDir}/gradle/versions.gradle"
 
 allprojects {
     ext {
-        appVersion = '0.2.0'
+        appVersion = '0.2.1'
         appGroup = 'nl.komponents.progress'
 
 
@@ -194,7 +194,7 @@ task release {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.4'
+    gradleVersion = '2.5'
 
     doLast() {
         def gradleOpts = "-XX:MaxMetaspaceSize=1024m -Xmx1024m"
