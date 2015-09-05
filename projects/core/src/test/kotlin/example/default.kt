@@ -71,6 +71,6 @@ private class ThreadLocalVal<T>(private val initializer: () -> T) : ReadOnlyProp
         override fun initialValue(): T = initializer()
     }
 
-    public override fun get(thisRef: Any?, desc: PropertyMetadata): T = threadLocal.get()
+    public override fun get(thisRef: Any?, property: PropertyMetadata): T = threadLocal.get()
 }
 
