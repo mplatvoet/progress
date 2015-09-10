@@ -33,9 +33,9 @@ public interface Progress {
          *
          * By default this just executes immediately
          */
-        volatile var defaultExecutor : (() -> Unit) -> Unit = { fn -> fn() }
+        @Volatile var defaultExecutor : (() -> Unit) -> Unit = { fn -> fn() }
 
-        volatile var callbackType : CallbackType = CallbackType.BUFFERED
+        @Volatile var callbackType : CallbackType = CallbackType.BUFFERED
 
         public fun control(executor: (() -> Unit) -> Unit = defaultExecutor): SingleProgressControl {
             return concreteSingleProgressControl(executor)
