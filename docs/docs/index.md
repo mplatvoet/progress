@@ -23,7 +23,7 @@ control.value = 1.0
 ```
 
 ## Getting started
-This version is build against `kotlin-stdlib:0.13.xxxx`.
+This version is build against `kotlin-stdlib:0.13.1513`.
 
 ###Gradle
 ```groovy
