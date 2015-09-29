@@ -21,7 +21,7 @@
  */
 
 buildscript {
-    ext.kotlinVersion = '0.13.1513'
+    ext.kotlinVersion = '0.1-SNAPSHOT'
     ext.extraConfVersion = '2.2.+'
 
     repositories {
@@ -202,7 +202,7 @@ task release {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.5'
+    gradleVersion = '2.7'
 
     doLast() {
         def gradleOpts = "-XX:MaxMetaspaceSize=1024m -Xmx1024m"
