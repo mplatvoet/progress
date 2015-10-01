@@ -21,7 +21,7 @@
  */
 
 buildscript {
-    ext.kotlinVersion = '0.1-SNAPSHOT'
+    ext.kotlinVersion = '0.14.449'
     ext.extraConfVersion = '2.2.+'
 
     repositories {
