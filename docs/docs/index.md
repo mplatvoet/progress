@@ -23,12 +23,12 @@ control.value = 1.0
 ```
 
 ## Getting started
-This version is build against `kotlin-stdlib:0.14.449`.
+This version is build against `kotlin-stdlib:0.14.451`.
 
 ###Gradle
 ```groovy
 dependencies {
-    compile 'nl.komponents.progress:progress:0.4.+'
+    compile 'nl.komponents.progress:progress:0.5.+'
 }
 ```
 
@@ -37,6 +37,6 @@ dependencies {
 <dependency>
 	<groupId>nl.komponents.progress</groupId>
 	<artifactId>progress</artifactId>
-	<version>[0.4.0, 0.5.0)</version>
+	<version>[0.5.0, 0.6.0)</version>
 </dependency>
 ```
