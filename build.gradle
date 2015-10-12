@@ -123,8 +123,10 @@ subprojects {
 
             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-
-            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
+            repository(url : 'https://oss.sonatype.org/service/local/staging/deploy/maven2') {
+                authentication(userName: sonatypeUsr, password: sonatypePwd)
+            }
+            snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots') {
                 authentication(userName: sonatypeUsr, password: sonatypePwd)
             }
 
@@ -213,7 +215,6 @@ task wrapper(type: Wrapper) {
                 "set GRADLE_OPTS=$gradleBatOpts %GRADLE_OPTS%\nset DEFAULT_JVM_OPTS=")
     }
 }
-
 
 
 
