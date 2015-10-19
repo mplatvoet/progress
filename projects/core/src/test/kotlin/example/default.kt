@@ -26,6 +26,7 @@ import nl.komponents.progress.OutOfRangeException
 import nl.komponents.progress.Progress
 import java.text.DecimalFormat
 import kotlin.properties.ReadOnlyProperty
+import kotlin.reflect.KProperty
 
 fun main(args: Array<String>) {
     val masterControl = Progress.containerControl()
@@ -71,6 +72,6 @@ private class ThreadLocalVal<T>(private val initializer: () -> T) : ReadOnlyProp
         override fun initialValue(): T = initializer()
     }
 
-    public override fun get(thisRef: Any?, property: PropertyMetadata): T = threadLocal.get()
+    public override fun getValue(thisRef: Any?, property: KProperty<*>): T = threadLocal.get()
 }
 
