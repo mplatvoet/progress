@@ -76,14 +76,14 @@ private class JvmContainerProgress(executor: (() -> Unit) -> Unit) : ContainerPr
 
     override fun contains(progress: Progress): Boolean {
         if (this == progress) return true
-        return childProgresses any { child -> child.progress.contains(progress) }
+        return childProgresses.any { child -> child.progress.contains(progress) }
     }
 
     override fun addChild(progress: Progress, weight: Double) {
         if (weight < 0.0) throw ArgumentException("weight can not be negative")
         if (progress.contains(this)) throw ArgumentException("circular reference")
 
-        childProgresses add ChildProgress(progress, weight)
+        childProgresses.add(ChildProgress(progress, weight))
         progress.update { updateValue() }
     }
 
@@ -128,7 +128,7 @@ private abstract class CallbackSupport(override val executor: (() -> Unit) -> Un
         if (notifyOnAdd) {
             callback.execute(this)
         }
-        callbacks add callback
+        callbacks.add(callback)
     }
 }
 
