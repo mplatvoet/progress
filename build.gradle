@@ -39,7 +39,7 @@ buildscript {
 
 allprojects {
     ext {
-        appVersion = '1.0.0'
+        appVersion = '1.0.0-beta.3'
         appGroup = 'nl.komponents.progress'
 
 
