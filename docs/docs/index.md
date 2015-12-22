@@ -23,7 +23,7 @@ control.value = 1.0
 ```
 
 ## Getting started
-This version is build against Kotlin 1.0 beta 3: `1.0.0-beta-3595`.
+This version is build against Kotlin 1.0 beta 4: `1.0.0-beta-4583`.
 
 ###Gradle
 ```groovy
