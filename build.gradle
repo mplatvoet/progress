@@ -21,7 +21,7 @@
  */
 
 buildscript {
-    ext.kotlinVersion = '1.0.0-beta-3595'
+    ext.kotlinVersion = '1.0.0-beta-4583'
     ext.extraConfVersion = '2.2.+'
 
     repositories {
@@ -39,7 +39,7 @@ buildscript {
 
 allprojects {
     ext {
-        appVersion = '1.0.0-beta.3'
+        appVersion = '1.0.0-beta.4'
         appGroup = 'nl.komponents.progress'
 
 
