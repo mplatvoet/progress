@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Mark Platvoet<mplatvoet@gmail.com>
+ * Copyright (c) 2016 Mark Platvoet<mplatvoet@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
  */
 
 buildscript {
-    ext.kotlinVersion = '1.0.0-beta-4583'
+    ext.kotlinVersion = '1.0.0-rc-1036'
     ext.extraConfVersion = '2.2.+'
 
     repositories {
@@ -39,7 +39,7 @@ buildscript {
 
 allprojects {
     ext {
-        appVersion = '1.0.0-beta.4'
+        appVersion = '1.0.0-rc.1036'
         appGroup = 'nl.komponents.progress'
 
 
