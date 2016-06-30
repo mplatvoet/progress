@@ -21,7 +21,7 @@
  */
 
 buildscript {
-    ext.kotlinVersion = '1.0.0-rc-1036'
+    ext.kotlinVersion = '1.0.3'
     ext.extraConfVersion = '2.2.+'
 
     repositories {
@@ -39,7 +39,7 @@ buildscript {
 
 allprojects {
     ext {
-        appVersion = '1.0.0-rc.1036'
+        appVersion = '1.0.3'
         appGroup = 'nl.komponents.progress'
 
 
@@ -200,22 +200,6 @@ task jars() {
 task release {
     dependsOn subprojects.uploadArchives
 }
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.8'
-
-    doLast() {
-        def gradleOpts = "-XX:MaxMetaspaceSize=1024m -Xmx1024m"
-        def gradleBatOpts = "$gradleOpts -XX:MaxHeapSize=256m"
-        File wrapperFile = file("gradlew")
-        wrapperFile.text = wrapperFile.text.replace("DEFAULT_JVM_OPTS=",
-                "GRADLE_OPTS=\"$gradleOpts \$GRADLE_OPTS\"\nDEFAULT_JVM_OPTS=")
-        File wrapperBatFile = file("gradlew.bat")
-        wrapperBatFile.text = wrapperBatFile.text.replace("set DEFAULT_JVM_OPTS=",
-                "set GRADLE_OPTS=$gradleBatOpts %GRADLE_OPTS%\nset DEFAULT_JVM_OPTS=")
-    }
-}
-
 
 
 defaultTasks 'clean', 'jars'
